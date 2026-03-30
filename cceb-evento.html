@@ -670,13 +670,14 @@
     background: rgba(201,162,39,0.04);
   }
 
-  .checkbox-item input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    padding: 0;
-    accent-color: var(--gold);
-    flex-shrink: 0;
-    cursor: pointer;
+  .checkbox-item:has(input:checked) {
+    border-color: var(--gold);
+    background: rgba(201, 162, 39, 0.1);
+    box-shadow: 0 0 8px rgba(201, 162, 39, 0.2);
+  }
+
+  .checkbox-item input {
+    display: none;
   }
 
   .checkbox-item span {
@@ -1275,7 +1276,7 @@
   document.querySelectorAll('.timeline-item').forEach(el => observer.observe(el));
 
   // Form submit
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
     const nome = form.nome.value.trim();
@@ -1288,11 +1289,46 @@
       return;
     }
 
-    // Hide form, show confirmation
-    document.getElementById('form-section').style.display = 'none';
-    document.getElementById('confirmacao').classList.add('active');
-    document.getElementById('inscricao').scrollIntoView({ behavior: 'smooth' });
-    showToast('✓ Inscrição enviada com sucesso!');
+    const restricaoEl = form.restricao;
+    const restricao = restricaoEl.value
+      ? restricaoEl.options[restricaoEl.selectedIndex].text
+      : 'Nenhuma restrição';
+
+    const atividade = [...form.querySelectorAll('input[name="atividade"]:checked')]
+      .map(cb => cb.value);
+
+    const obs = form.obs.value.trim() || null;
+
+    const payload = { nome, email, telefone, nascimento, restricao, atividade, obs };
+
+    const btn = form.querySelector('.submit-btn');
+    const textoOriginal = btn.textContent;
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+
+    try {
+      const resp = await fetch('http://127.0.0.1:8000/enviar-inscricao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!resp.ok) {
+        const erro = await resp.json().catch(() => null);
+        throw new Error(erro?.detail || `Erro ${resp.status}`);
+      }
+
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('confirmacao').classList.add('active');
+      document.getElementById('inscricao').scrollIntoView({ behavior: 'smooth' });
+      showToast('✓ Inscrição enviada com sucesso!');
+      form.reset();
+    } catch (err) {
+      showToast(`⚠ Falha ao enviar: ${err.message}`, true);
+    } finally {
+      btn.textContent = textoOriginal;
+      btn.disabled = false;
+    }
   }
 
   function voltarForm() {
