@@ -1,8 +1,6 @@
 import os
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
+import resend
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,11 +8,9 @@ from pydantic import BaseModel, EmailStr
 
 load_dotenv()
 
-SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_EMAIL_REMETENTE = os.getenv("SMTP_EMAIL_REMETENTE", "")
-SMTP_SENHA_APP = os.getenv("SMTP_SENHA_APP", "")
 SMTP_EMAIL_DESTINO = os.getenv("SMTP_EMAIL_DESTINO", "")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+resend.api_key = RESEND_API_KEY
 
 
 class FormularioInscricao(BaseModel):
@@ -62,17 +58,15 @@ def _formatar_corpo(dados: FormularioInscricao) -> str:
 
 @app.post("/enviar-inscricao")
 async def enviar_inscricao(dados: FormularioInscricao):
-    msg = MIMEMultipart()
-    msg["From"] = SMTP_EMAIL_REMETENTE
-    msg["To"] = SMTP_EMAIL_DESTINO
-    msg["Subject"] = f"CCEB — Nova Inscrição: {dados.nome}"
-    msg.attach(MIMEText(_formatar_corpo(dados), "plain", "utf-8"))
+    params = {
+        "from": "CCEB Site <onboarding@resend.dev>",
+        "to": [SMTP_EMAIL_DESTINO],
+        "subject": f"CCEB — Nova Inscrição: {dados.nome}",
+        "text": _formatar_corpo(dados),
+    }
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SMTP_EMAIL_REMETENTE, SMTP_SENHA_APP)
-            server.sendmail(SMTP_EMAIL_REMETENTE, SMTP_EMAIL_DESTINO, msg.as_string())
+        email_response = resend.Emails.send(params)
     except Exception as exc:
         raise HTTPException(
             status_code=500,
