@@ -25,19 +25,21 @@ class FormularioInscricao(BaseModel):
 
 app = FastAPI(title="CCEB - API de Inscrição")
 
-origins_env = os.getenv("ALLOWED_ORIGINS")
-allowed_origins = (
-    [o.strip() for o in origins_env.split(",") if o.strip()]
-    if origins_env
-    else ["*"]
-)
+REQUIRED_ORIGINS = [
+    "https://grupobotteleseventos.com.br",
+    "https://www.grupobotteleseventos.com.br",
+]
+
+origins_env = os.getenv("ALLOWED_ORIGINS", "")
+extra_origins = [o.strip() for o in origins_env.split(",") if o.strip()] if origins_env else []
+allowed_origins = list({*REQUIRED_ORIGINS, *extra_origins})
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["POST"],
-    allow_headers=["*"],
+    allow_methods=["POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
 )
 
 
