@@ -1165,7 +1165,7 @@
 
     <!-- FORM -->
     <div class="form-wrapper" id="form-section">
-      <form id="inscricao-form" onsubmit="handleSubmit(event)" novalidate>
+      <form id="inscricao-form" onsubmit="handleSubmit(event)">
         <div class="form-row">
           <div class="form-group">
             <label for="nome">Nome Completo <span>*</span></label>
@@ -1314,8 +1314,12 @@
       });
 
       if (!resp.ok) {
-        const erro = await resp.json().catch(() => null);
-        throw new Error(erro?.detail || `Erro ${resp.status}`);
+        if (resp.status === 422) {
+          alert('Ops! Verifique os dados preenchidos. Certifique-se de que o e-mail está correto e tente novamente.');
+        } else {
+          alert('Ops! Ocorreu um erro ao enviar sua inscrição. Por favor, tente novamente mais tarde.');
+        }
+        throw new Error(`Erro ${resp.status}`);
       }
 
       document.getElementById('form-section').style.display = 'none';
@@ -1324,7 +1328,10 @@
       showToast('✓ Inscrição enviada com sucesso!');
       form.reset();
     } catch (err) {
-      showToast(`⚠ Falha ao enviar: ${err.message}`, true);
+      if (!err.message.startsWith('Erro ')) {
+        alert('Ops! Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+      }
+      showToast('⚠ Falha ao enviar a inscrição.', true);
     } finally {
       btn.textContent = textoOriginal;
       btn.disabled = false;
