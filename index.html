@@ -1285,7 +1285,7 @@
     const nascimento = form.nascimento.value;
 
     if (!nome || !email || !telefone || !nascimento) {
-      showToast('⚠ Preencha todos os campos obrigatórios.', true);
+      alert('Campo preenchido incorretamente. Por favor, revise as informações e tente novamente.');
       return;
     }
 
