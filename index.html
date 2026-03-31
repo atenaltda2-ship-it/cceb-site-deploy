@@ -1173,7 +1173,7 @@
           </div>
           <div class="form-group">
             <label for="email">E-mail <span>*</span></label>
-            <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+            <input type="email" id="email" name="email" placeholder="seu@email.com" pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" required>
           </div>
         </div>
         <div class="form-row">
@@ -1313,25 +1313,15 @@
         body: JSON.stringify(payload),
       });
 
-      if (!resp.ok) {
-        if (resp.status === 422) {
-          alert('Ops! Verifique os dados preenchidos. Certifique-se de que o e-mail está correto e tente novamente.');
-        } else {
-          alert('Ops! Ocorreu um erro ao enviar sua inscrição. Por favor, tente novamente mais tarde.');
-        }
-        throw new Error(`Erro ${resp.status}`);
-      }
+      if (!resp.ok) throw new Error('validation');
 
       document.getElementById('form-section').style.display = 'none';
       document.getElementById('confirmacao').classList.add('active');
       document.getElementById('inscricao').scrollIntoView({ behavior: 'smooth' });
       showToast('✓ Inscrição enviada com sucesso!');
       form.reset();
-    } catch (err) {
-      if (!err.message.startsWith('Erro ')) {
-        alert('Ops! Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
-      }
-      showToast('⚠ Falha ao enviar a inscrição.', true);
+    } catch {
+      alert('Campo preenchido incorretamente. Por favor, revise as informações e tente novamente.');
     } finally {
       btn.textContent = textoOriginal;
       btn.disabled = false;
