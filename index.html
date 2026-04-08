@@ -523,8 +523,9 @@
   }
 
   .atividades-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 24px;
   }
 
@@ -537,6 +538,8 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    flex: 1 1 220px;
+    max-width: 260px;
   }
 
   .atividade-card::after {
@@ -665,6 +668,11 @@
     transition: border-color 0.3s, background 0.3s;
   }
 
+  .checkbox-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
   .checkbox-item:hover {
     border-color: rgba(201,162,39,0.4);
     background: rgba(201,162,39,0.04);
@@ -750,56 +758,134 @@
     line-height: 1.8;
   }
 
-  /* ===== TRAILER / EMBED ===== */
+  /* ===== TRAILER / COVER + MODAL ===== */
   #trailer {
     background: var(--green-deep);
     text-align: center;
   }
 
-  .video-placeholder {
+  .video-cover {
     max-width: 800px;
     margin: 0 auto;
-    background: rgba(201,162,39,0.05);
+    aspect-ratio: 16 / 9;
     border: 1px solid rgba(201,162,39,0.2);
-    aspect-ratio: 16/9;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background: rgba(201,162,39,0.05);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    transition: border-color 0.3s;
   }
 
-  .video-placeholder:hover { border-color: var(--gold); }
+  .video-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    transition: background 0.4s;
+  }
 
-  .video-play {
-    width: 80px;
-    height: 80px;
-    background: rgba(201,162,39,0.15);
+  .video-cover:hover::after {
+    background: rgba(0,0,0,0.3);
+  }
+
+  .video-cover-play {
+    width: 90px;
+    height: 90px;
     border: 2px solid var(--gold);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+    background: rgba(26,46,26,0.7);
+    transition: transform 0.4s, background 0.4s, box-shadow 0.4s;
   }
 
-  .video-placeholder:hover .video-play {
+  .video-cover-play svg {
+    width: 32px;
+    height: 32px;
+    fill: var(--gold);
+    margin-left: 4px;
+  }
+
+  .video-cover:hover .video-cover-play {
+    transform: scale(1.15);
     background: var(--gold);
-    color: var(--green-deep);
-    transform: scale(1.1);
+    box-shadow: 0 0 40px rgba(201,162,39,0.5);
   }
 
-  .video-label {
+  .video-cover:hover .video-cover-play svg {
+    fill: var(--green-deep);
+  }
+
+  .video-cover-label {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: 'Cinzel', serif;
     font-size: 0.7rem;
     letter-spacing: 0.3em;
     color: var(--gold);
     text-transform: uppercase;
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+  .video-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .video-modal-overlay.active {
+    display: flex;
+  }
+
+  .video-modal-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    aspect-ratio: 16 / 9;
+  }
+
+  .video-modal-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 1px solid rgba(201,162,39,0.3);
+  }
+
+  .video-modal-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    background: none;
+    border: 1px solid rgba(201,162,39,0.4);
+    color: var(--gold);
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+    font-family: 'Cinzel', serif;
+    line-height: 1;
+  }
+
+  .video-modal-close:hover {
+    background: var(--gold);
+    color: var(--green-deep);
   }
 
   /* ===== FOOTER ===== */
@@ -899,7 +985,7 @@
     <p class="hero-eyebrow">Centro de Cultura Equestre Botteles</p>
     <h1 class="hero-title">Uma Jornada de<br><em>Excelência</em></h1>
     <p class="hero-subtitle">Onde grandes negócios encontram momentos inesquecíveis.</p>
-    <a href="#inscricao" class="hero-cta">Garantir minha vaga</a>
+    <a href="#inscricao" class="hero-cta">Solicite sua inscrição</a>
   </div>
   <div class="hero-scroll">
     <span>Descer</span>
@@ -927,8 +1013,8 @@
         </div>
         <div class="stat-card">
           <span class="stat-icon">🎵</span>
-          <span class="stat-value">Música ao Vivo</span>
-          <span class="stat-label">Sertanejo e modão em performance exclusiva</span>
+          <span class="stat-value">Música ao ambiente</span>
+          <span class="stat-label">Sertanejo e modão em toda a jornada</span>
         </div>
         <div class="stat-card">
           <span class="stat-icon">🔥</span>
@@ -1002,7 +1088,7 @@
         <div class="tl-content">
           <span class="tl-time">17:20 — Melodias</span>
           <h3 class="tl-title">Melodias e Modão</h3>
-          <p class="tl-desc">Início da música ao vivo focada em sertanejo e modão. A alma da fazenda ganha voz — relaxando a mente executiva e criando o cenário sonoro perfeito para conversas de alto nível.</p>
+          <p class="tl-desc">Início da Música ambiente focada em sertanejo e modão. A alma da fazenda ganha voz — relaxando a mente executiva e criando o cenário sonoro perfeito para conversas de alto nível.</p>
           <span class="tl-tag">A Visão</span>
         </div>
         <div class="tl-center"><div class="tl-line"></div><div class="tl-dot"></div><div class="tl-line"></div></div>
@@ -1037,7 +1123,7 @@
         <div class="tl-content">
           <span class="tl-time">18:20 — Conexão</span>
           <h3 class="tl-title">Conexão Livre</h3>
-          <p class="tl-desc">Networking potencializado pela música ao vivo. O momento onde as ideias recém-apresentadas começam a marinar em conversas de alto nível.</p>
+          <p class="tl-desc">Networking potencializado pela Música ambiente. O momento onde as ideias recém-apresentadas começam a marinar em conversas de alto nível.</p>
           <span class="tl-tag">O Calor Humano</span>
         </div>
       </div>
@@ -1115,8 +1201,8 @@
       </div>
       <div class="atividade-card">
         <span class="ativ-icon">🎵</span>
-        <h3 class="ativ-name">Música ao Vivo</h3>
-        <p class="ativ-desc">Sertanejo e modão autêntico tocados ao vivo durante toda a jornada</p>
+        <h3 class="ativ-name">Música ambiente</h3>
+        <p class="ativ-desc">Sertanejo e modão autêntico durante toda a jornada</p>
       </div>
       <div class="atividade-card">
         <span class="ativ-icon">🍖</span>
@@ -1148,9 +1234,11 @@
     <span class="section-tag">Trailer</span>
     <h2 class="section-title">Veja o que te espera</h2>
     <div class="gold-divider"><div class="gold-divider-diamond"></div></div>
-    <div class="video-placeholder" onclick="alert('Insira aqui o link do vídeo do evento.')">
-      <div class="video-play">▶</div>
-      <span class="video-label">Assistir Trailer do Evento</span>
+    <div class="video-cover" id="video-cover" onclick="abrirVideo()">
+      <div class="video-cover-play">
+        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+      </div>
+      <span class="video-cover-label">Assistir Trailer do Evento</span>
     </div>
   </div>
 </section>
@@ -1159,7 +1247,7 @@
 <section id="inscricao">
   <div class="section-inner">
     <span class="section-tag">Participação</span>
-    <h2 class="section-title">Garanta sua vaga</h2>
+    <h2 class="section-title">Solicite sua inscrição</h2>
     <div class="gold-divider"><div class="gold-divider-diamond"></div></div>
     <p class="section-lead">Preencha o formulário abaixo para registrar seu interesse e aguarde a confirmação da sua participação.</p>
 
@@ -1199,35 +1287,6 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Atividades de Interesse</label>
-          <div class="checkbox-group">
-            <label class="checkbox-item">
-              <input type="checkbox" name="atividade" value="cavalgada">
-              <span>🐎 Espetáculo Equestre</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" name="atividade" value="musica">
-              <span>🎵 Música Country ao Vivo</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" name="atividade" value="comida">
-              <span>🍖 Comida Típica</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" name="atividade" value="fogueira">
-              <span>🔥 Fogueira</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" name="atividade" value="touro">
-              <span>🐂 Touro Mecânico</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" name="atividade" value="tour">
-              <span>🌿 Tour pelo Haras</span>
-            </label>
-          </div>
-        </div>
-        <div class="form-group">
           <label for="obs">Outras Observações</label>
           <textarea id="obs" name="obs" placeholder="Informações adicionais que desejar compartilhar..."></textarea>
         </div>
@@ -1253,6 +1312,14 @@
   <div class="gold-divider" style="margin-bottom:20px"><div class="gold-divider-diamond"></div></div>
   <p class="footer-copy">© 2025 Centro de Cultura Equestre Botteles — Documento Confidencial</p>
 </footer>
+
+<!-- VIDEO MODAL -->
+<div class="video-modal-overlay" id="video-modal" onclick="fecharVideo(event)">
+  <div class="video-modal-wrapper">
+    <button class="video-modal-close" onclick="fecharVideo(event)">✕</button>
+    <iframe id="video-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast">✓ Inscrição enviada com sucesso!</div>
@@ -1341,6 +1408,33 @@
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3500);
   }
+
+  // Video modal
+  const VIDEO_URL = 'https://www.youtube.com/embed/ORSoOfHc630?si=5SBPF8fHwjAfjPOu&autoplay=1';
+  const modal = document.getElementById('video-modal');
+  const iframe = document.getElementById('video-iframe');
+
+  function abrirVideo() {
+    iframe.src = VIDEO_URL;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function fecharVideo(e) {
+    if (e.target === modal || e.target.closest('.video-modal-close')) {
+      iframe.src = '';
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      iframe.src = '';
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
 
   // Phone mask
   document.getElementById('telefone').addEventListener('input', function() {
