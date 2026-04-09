@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Country Botteles – Uma Jornada de Excelência</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
@@ -651,48 +652,6 @@
 
   textarea { resize: vertical; min-height: 100px; }
 
-  .checkbox-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 4px;
-  }
-
-  .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    padding: 10px 14px;
-    border: 1px solid rgba(201,162,39,0.15);
-    transition: border-color 0.3s, background 0.3s;
-  }
-
-  .checkbox-item:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    justify-content: center;
-  }
-
-  .checkbox-item:hover {
-    border-color: rgba(201,162,39,0.4);
-    background: rgba(201,162,39,0.04);
-  }
-
-  .checkbox-item:has(input:checked) {
-    border-color: var(--gold);
-    background: rgba(201, 162, 39, 0.1);
-    box-shadow: 0 0 8px rgba(201, 162, 39, 0.2);
-  }
-
-  .checkbox-item input {
-    display: none;
-  }
-
-  .checkbox-item span {
-    font-size: 0.9rem;
-    color: var(--cream-dark);
-  }
-
   .submit-btn {
     width: 100%;
     padding: 18px 40px;
@@ -1316,7 +1275,7 @@
 <div class="video-modal-overlay" id="video-modal" onclick="fecharVideo(event)">
   <div class="video-modal-wrapper">
     <button class="video-modal-close" onclick="fecharVideo(event)">✕</button>
-    <iframe id="video-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <iframe id="video-iframe" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </div>
 </div>
 
@@ -1360,12 +1319,9 @@
       ? restricaoEl.options[restricaoEl.selectedIndex].text
       : 'Nenhuma restrição';
 
-    const atividade = [...form.querySelectorAll('input[name="atividade"]:checked')]
-      .map(cb => cb.value);
-
     const obs = form.obs.value.trim() || null;
 
-    const payload = { nome, email, telefone, nascimento, restricao, atividade, obs };
+    const payload = { nome, email, telefone, nascimento, restricao, obs };
 
     const btn = form.querySelector('.submit-btn');
     const textoOriginal = btn.textContent;
@@ -1409,7 +1365,7 @@
   }
 
   // Video modal
-  const VIDEO_URL = 'https://www.youtube.com/embed/ORSoOfHc630?si=5SBPF8fHwjAfjPOu&autoplay=1';
+  const VIDEO_URL = 'https://www.youtube-nocookie.com/embed/ORSoOfHc630?si=vnVdLfgyKSTbwK3p&autoplay=1';
   const modal = document.getElementById('video-modal');
   const iframe = document.getElementById('video-iframe');
 
