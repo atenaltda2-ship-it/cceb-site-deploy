@@ -88,6 +88,35 @@
 
   .nav-links a:hover { color: var(--gold-light); }
 
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 950;
+  }
+
+  .nav-hamburger span {
+    width: 24px;
+    height: 2px;
+    background: var(--gold);
+    transition: transform 0.3s, opacity 0.3s;
+    display: block;
+  }
+
+  .nav-hamburger.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .nav-hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-hamburger.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
   /* ===== HERO ===== */
   #hero {
     min-height: 100vh;
@@ -906,20 +935,95 @@
   /* ===== RESPONSIVE ===== */
   @media (max-width: 900px) {
     nav { padding: 16px 24px; }
-    .nav-links { display: none; }
+
+    .nav-hamburger { display: flex; }
+
+    .nav-links {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15,25,15,0.97);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      z-index: 940;
+    }
+
+    .nav-links.open {
+      display: flex;
+    }
+
+    .nav-links a {
+      font-size: 1rem;
+      letter-spacing: 0.3em;
+    }
+
     .about-grid { grid-template-columns: 1fr; gap: 40px; }
+
     #programacao::before { left: 30px; }
     .timeline-item { grid-template-columns: 40px 1fr; }
     .tl-center { padding: 20px 0; }
+    .tl-content { padding: 24px 20px; }
+    .timeline-item:nth-child(odd) .tl-empty { display: none; }
+    .timeline-item:nth-child(odd) .tl-content { grid-column: 2; }
     .timeline-item:nth-child(even) .tl-empty { display: none; }
     .timeline-item:nth-child(even) .tl-content { grid-column: 2; }
+
+    .atividade-card { max-width: 100%; }
+
     .form-wrapper { padding: 40px 28px; }
     .form-row { grid-template-columns: 1fr; }
-    .checkbox-group { grid-template-columns: 1fr; }
+
+    .video-modal-close {
+      top: 8px;
+      right: 8px;
+      position: absolute;
+      z-index: 10;
+    }
   }
 
   @media (max-width: 600px) {
-    .about-stats { grid-template-columns: 1fr 1fr; }
+    section { padding: 64px 16px; }
+
+    .section-title { font-size: clamp(1.6rem, 5vw, 2.4rem); }
+    .section-lead { font-size: 1rem; margin-bottom: 40px; }
+
+    .hero-horse { font-size: 3.5rem; }
+    .hero-cta { padding: 14px 32px; font-size: 0.7rem; letter-spacing: 0.2em; }
+    .hero-scroll { display: none; }
+
+    .about-stats { grid-template-columns: 1fr; gap: 16px; }
+    .stat-card { padding: 24px 16px; }
+
+    .tl-title { font-size: 1.1rem; }
+    .tl-desc { font-size: 0.85rem; }
+    .tl-content { padding: 20px 16px; }
+
+    .ativ-name { font-size: 1rem; }
+    .ativ-desc { font-size: 0.8rem; }
+
+    .video-cover-play { width: 64px; height: 64px; }
+    .video-cover-play svg { width: 24px; height: 24px; }
+    .video-cover-label { font-size: 0.6rem; bottom: 16px; }
+
+    .form-wrapper { padding: 28px 16px; }
+    .form-wrapper::before, .form-wrapper::after { display: none; }
+
+    .confirm-title { font-size: 1.8rem; }
+    .confirm-text { font-size: 0.95rem; }
+
+    .toast {
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      text-align: center;
+    }
+
+    .footer-logo { font-size: 1.1rem; }
+    .footer-tagline { font-size: 0.8rem; }
+
+    .video-modal-wrapper { aspect-ratio: auto; height: auto; max-height: 80vh; }
   }
 </style>
 </head>
@@ -928,11 +1032,14 @@
 <!-- NAV -->
 <nav id="navbar">
   <div class="nav-logo">CCEB</div>
-  <ul class="nav-links">
-    <li><a href="#sobre">O Evento</a></li>
-    <li><a href="#programacao">Programação</a></li>
-    <li><a href="#atividades">Atividades</a></li>
-    <li><a href="#inscricao">Inscrição</a></li>
+  <div class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#sobre" onclick="closeMenu()">O Evento</a></li>
+    <li><a href="#programacao" onclick="closeMenu()">Programação</a></li>
+    <li><a href="#atividades" onclick="closeMenu()">Atividades</a></li>
+    <li><a href="#inscricao" onclick="closeMenu()">Inscrição</a></li>
   </ul>
 </nav>
 
@@ -1288,6 +1395,17 @@
     const nav = document.getElementById('navbar');
     nav.classList.toggle('scrolled', window.scrollY > 60);
   });
+
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('nav-hamburger').classList.toggle('active');
+    document.getElementById('nav-links').classList.toggle('open');
+  }
+
+  function closeMenu() {
+    document.getElementById('nav-hamburger').classList.remove('active');
+    document.getElementById('nav-links').classList.remove('open');
+  }
 
   // Timeline reveal
   const observer = new IntersectionObserver((entries) => {
